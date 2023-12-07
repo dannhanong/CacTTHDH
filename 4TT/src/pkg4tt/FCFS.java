@@ -307,11 +307,28 @@ public class FCFS extends javax.swing.JFrame {
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         // TODO add your handling code here:
-        int d=5;
+        int d = 5;
         int[] pid = {Integer.parseInt(pid1.getText()), Integer.parseInt(pid2.getText()), Integer.parseInt(pid3.getText()), Integer.parseInt(pid4.getText()), Integer.parseInt(pid5.getText())};
         int[] ar = {Integer.parseInt(ar1.getText()), Integer.parseInt(ar2.getText()), Integer.parseInt(ar3.getText()), Integer.parseInt(ar4.getText()), Integer.parseInt(ar5.getText())};
         int[] bt = {Integer.parseInt(bt1.getText()), Integer.parseInt(bt2.getText()), Integer.parseInt(bt3.getText()), Integer.parseInt(bt4.getText()), Integer.parseInt(bt5.getText())};
         if (jrdoFCFS.isSelected()) {
+
+            for (int i = 0; i < 5; i++) {
+                for (int j = 0; j < 5 - (i + 1); j++) {
+                    if (ar[j] > ar[j + 1]) {
+                        temp = ar[j];
+                        ar[j] = ar[j + 1];
+                        ar[j + 1] = temp;
+                        temp = bt[j];
+                        bt[j] = bt[j + 1];
+                        bt[j + 1] = temp;
+                        temp = pid[j];
+                        pid[j] = pid[j + 1];
+                        pid[j + 1] = temp;
+                    }
+                }
+            }
+
             for (int i = 0; i < 5; i++) {
                 if (i == 0) {
                     ct[i] = ar[i] + bt[i];
@@ -322,42 +339,42 @@ public class FCFS extends javax.swing.JFrame {
                         ct[i] = ct[i - 1] + bt[i];
                     }
                 }
-                
-                if((ar[i] == 0) && (bt[i] == 0)){
+
+                if ((ar[i] == 0) && (bt[i] == 0)) {
                     ct[i] = 0;
                     ta[i] = 0;
                     wt[i] = 0;
                     d--;
                 }
-                
+
                 ta[i] = ct[i] - ar[i];
                 wt[i] = ta[i] - bt[i];
                 avgwt += wt[i];
-                avgta += ta[i];   
+                avgta += ta[i];
             }
 
             for (int i = 0; i < 5; i++) {
-                ct1.setText(ct[0]+"");
-                ct2.setText(ct[1]+"");
-                ct3.setText(ct[2]+"");
-                ct4.setText(ct[3]+"");
-                ct5.setText(ct[4]+"");
-                
-                ta1.setText(ta[0]+"");
-                ta2.setText(ta[1]+"");
-                ta3.setText(ta[2]+"");
-                ta4.setText(ta[3]+"");
-                ta5.setText(ta[4]+"");  
-                
-                wt1.setText(wt[0]+"");
-                wt2.setText(wt[1]+"");
-                wt3.setText(wt[2]+"");
-                wt4.setText(wt[3]+"");
-                wt5.setText(wt[4]+"");
-                
+                ct1.setText(ct[0] + "");
+                ct2.setText(ct[1] + "");
+                ct3.setText(ct[2] + "");
+                ct4.setText(ct[3] + "");
+                ct5.setText(ct[4] + "");
+
+                ta1.setText(ta[0] + "");
+                ta2.setText(ta[1] + "");
+                ta3.setText(ta[2] + "");
+                ta4.setText(ta[3] + "");
+                ta5.setText(ta[4] + "");
+
+                wt1.setText(wt[0] + "");
+                wt2.setText(wt[1] + "");
+                wt3.setText(wt[2] + "");
+                wt4.setText(wt[3] + "");
+                wt5.setText(wt[4] + "");
+
             }
             System.out.println(d);
-            avgw.setText(avgwt/d +"");
+            avgw.setText(avgwt / d + "");
         }
     }//GEN-LAST:event_jButton1ActionPerformed
 
