@@ -51,7 +51,7 @@ public class TTs extends javax.swing.JFrame {
         rdoRR = new javax.swing.JRadioButton();
         rdoSRTN = new javax.swing.JRadioButton();
         jButton1 = new javax.swing.JButton();
-        avgw = new javax.swing.JLabel();
+        jlbAvgwt = new javax.swing.JLabel();
         jtfPID = new javax.swing.JTextField();
         jtfBT = new javax.swing.JTextField();
         jLabel1 = new javax.swing.JLabel();
@@ -61,7 +61,6 @@ public class TTs extends javax.swing.JFrame {
         jScrollPane1 = new javax.swing.JScrollPane();
         table = new javax.swing.JTable();
         btThem = new javax.swing.JButton();
-        jtfQ = new javax.swing.JTextField();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -146,7 +145,7 @@ public class TTs extends javax.swing.JFrame {
                                     .addGroup(layout.createSequentialGroup()
                                         .addComponent(jLabel3)
                                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                        .addComponent(avgw, javax.swing.GroupLayout.PREFERRED_SIZE, 129, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                        .addComponent(jlbAvgwt, javax.swing.GroupLayout.PREFERRED_SIZE, 129, javax.swing.GroupLayout.PREFERRED_SIZE))
                                     .addGroup(layout.createSequentialGroup()
                                         .addComponent(jtfBT, javax.swing.GroupLayout.PREFERRED_SIZE, 71, javax.swing.GroupLayout.PREFERRED_SIZE)
                                         .addGap(49, 49, 49)
@@ -159,10 +158,7 @@ public class TTs extends javax.swing.JFrame {
                                 .addGap(51, 51, 51)
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addComponent(rdoSRTN)
-                                    .addGroup(layout.createSequentialGroup()
-                                        .addComponent(rdoRR)
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                        .addComponent(jtfQ, javax.swing.GroupLayout.PREFERRED_SIZE, 71, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                    .addComponent(rdoRR))
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 181, Short.MAX_VALUE)
                                 .addComponent(jButton1))))
                     .addGroup(layout.createSequentialGroup()
@@ -188,11 +184,10 @@ public class TTs extends javax.swing.JFrame {
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 267, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(49, 49, 49)
+                        .addGap(50, 50, 50)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(rdoFCFS)
-                            .addComponent(rdoRR)
-                            .addComponent(jtfQ, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(rdoRR))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(rdoSJF)
@@ -204,8 +199,8 @@ public class TTs extends javax.swing.JFrame {
                         .addGap(22, 22, 22)))
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
                     .addComponent(jLabel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(avgw, javax.swing.GroupLayout.DEFAULT_SIZE, 24, Short.MAX_VALUE))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(jlbAvgwt, javax.swing.GroupLayout.DEFAULT_SIZE, 24, Short.MAX_VALUE))
+                .addContainerGap(7, Short.MAX_VALUE))
         );
 
         pack();
@@ -232,7 +227,7 @@ public class TTs extends javax.swing.JFrame {
         int wt[] = new int[model.getRowCount()];
         int temp;
         float avgwt = 0, avgta = 0;
-        
+
         for (int i = 0; i < rowCount; i++) {
             pid[i] = (int) model.getValueAt(i, 0);
         }
@@ -242,7 +237,8 @@ public class TTs extends javax.swing.JFrame {
         for (int i = 0; i < rowCount; i++) {
             bt[i] = (int) model.getValueAt(i, 2);
         }
-        
+
+        //FCFS
         if (rdoFCFS.isSelected()) {
             for (int i = 0; i < rowCount; i++) {
                 for (int j = 0; j < rowCount - (i + 1); j++) {
@@ -274,11 +270,57 @@ public class TTs extends javax.swing.JFrame {
                 avgwt += wt[i];
                 avgta += ta[i];
             }
+            for (int i = 0; i < rowCount; i++) {
+                model.setValueAt(ct[i], i, 3);
+                model.setValueAt(ta[i], i, 4);
+                model.setValueAt(wt[i], i, 5);
+            }
+            jlbAvgwt.setText(avgwt/rowCount + "");
+        }
+
+        //SJF
+        else if (rdoSJF.isSelected()) {
+            int f[] = new int[rowCount];
+            int st = 0, tot = 0;
+
+            for (int i = 0; i < rowCount; i++) {
+                f[i] = 0;
+            }
+            while (true) {
+                int c = rowCount, min = 999999;
+
+                if (tot == rowCount) {
+                    break;
+                }
+
+                for (int i = 0; i < rowCount; i++) {
+
+                    if ((ar[i] <= st) && (f[i] == 0) && (bt[i] < min)) {
+                        min = bt[i];
+                        c = i;
+                    }
+                }
+                if (c == rowCount) {
+                    st++;
+                } else {
+                    ct[c] = st + bt[c];
+                    st += bt[c];
+                    ta[c] = ct[c] - ar[c];
+                    wt[c] = ta[c] - bt[c];
+                    f[c] = 1;
+                    pid[tot] = c + 1;
+                    tot++;
+                    
+                    avgwt += wt[c];
+                    avgta += ta[c];
+                }
+            }
             for(int i=0; i<rowCount; i++){
                 model.setValueAt(ct[i], i, 3);
                 model.setValueAt(ta[i], i, 4);
                 model.setValueAt(wt[i], i, 5);
             }
+            jlbAvgwt.setText(avgwt/rowCount + "");
         }
     }//GEN-LAST:event_jButton1ActionPerformed
 
@@ -320,7 +362,6 @@ public class TTs extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JLabel avgw;
     private javax.swing.JButton btThem;
     private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel1;
@@ -328,10 +369,10 @@ public class TTs extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JLabel jlbAvgwt;
     private static javax.swing.JTextField jtfAR;
     private static javax.swing.JTextField jtfBT;
     private static javax.swing.JTextField jtfPID;
-    private javax.swing.JTextField jtfQ;
     private javax.swing.JRadioButton rdoFCFS;
     private javax.swing.JRadioButton rdoRR;
     private javax.swing.JRadioButton rdoSJF;
