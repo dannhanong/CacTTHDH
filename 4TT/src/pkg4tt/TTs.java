@@ -21,13 +21,14 @@ public class TTs extends javax.swing.JFrame {
      */
     public TTs() {
         initComponents();
+        this.getRootPane().setDefaultButton(btThem);
         DefaultTableModel model = new DefaultTableModel();
         table.setModel(model);
         model.addColumn("PID");
         model.addColumn("Arrival Time");
         model.addColumn("Burst Time");
-        model.addColumn("Complete Time");
-        model.addColumn("Turn Time");
+        model.addColumn("Completion Time");
+        model.addColumn("Turnaround Time");
         model.addColumn("Wasting Time");
         ButtonGroup bg = new ButtonGroup();
         bg.add(rdoRR);
@@ -85,12 +86,12 @@ public class TTs extends javax.swing.JFrame {
         jLabel1.setText("PID");
 
         jLabel2.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel2.setText("arrival time");
+        jLabel2.setText("Arrival Time");
 
         jLabel3.setText("AVG Waste Time: ");
 
         jLabel4.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel4.setText("brust time");
+        jLabel4.setText("Burst Time");
 
         table.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -405,11 +406,12 @@ public class TTs extends javax.swing.JFrame {
                                 wt[i] = ta[i] - bt[i];
                                 completedProcesses++;
                             }
-                        }
+                            avgwt += wt[i];
+                        }                        
                     }
                 }
 
-                avgwt = calculateAverage(wt);
+                avgwt = avgwt/rowCount;
 
                 for (int i = 0; i < rowCount; i++) {
                     model.setValueAt(ct[i], i, 3);
@@ -420,13 +422,13 @@ public class TTs extends javax.swing.JFrame {
             }
         }
     }//GEN-LAST:event_jButton1ActionPerformed
-    private static float calculateAverage(int[] array) {
-        int sum = 0;
-        for (int value : array) {
-            sum += value;
-        }
-        return (float) sum / array.length;
-    }
+//    private static float calculateAverage(int[] array) {
+//        int sum = 0;
+//        for (int value : array) {
+//            sum += value;
+//        }
+//        return (float) sum / array.length;
+//    }
 
     /**
      * @param args the command line arguments
