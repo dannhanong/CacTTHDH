@@ -61,6 +61,7 @@ public class TTs extends javax.swing.JFrame {
         jScrollPane1 = new javax.swing.JScrollPane();
         table = new javax.swing.JTable();
         btThem = new javax.swing.JButton();
+        jtfRR = new javax.swing.JTextField();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -158,7 +159,10 @@ public class TTs extends javax.swing.JFrame {
                                 .addGap(51, 51, 51)
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addComponent(rdoSRTN)
-                                    .addComponent(rdoRR))
+                                    .addGroup(layout.createSequentialGroup()
+                                        .addComponent(rdoRR)
+                                        .addGap(18, 18, 18)
+                                        .addComponent(jtfRR, javax.swing.GroupLayout.PREFERRED_SIZE, 71, javax.swing.GroupLayout.PREFERRED_SIZE)))
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 181, Short.MAX_VALUE)
                                 .addComponent(jButton1))))
                     .addGroup(layout.createSequentialGroup()
@@ -184,10 +188,11 @@ public class TTs extends javax.swing.JFrame {
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 267, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(50, 50, 50)
+                        .addGap(49, 49, 49)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(rdoFCFS)
-                            .addComponent(rdoRR))
+                            .addComponent(rdoRR)
+                            .addComponent(jtfRR, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(rdoSJF)
@@ -208,12 +213,14 @@ public class TTs extends javax.swing.JFrame {
 
     private void btThemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btThemActionPerformed
         // TODO add your handling code here:
+        
         int pid = Integer.parseInt(jtfPID.getText());
         int ar = Integer.parseInt(jtfAR.getText());
         int bt = Integer.parseInt(jtfBT.getText());
         Object[] giaTri = {pid, ar, bt};
         model = (DefaultTableModel) table.getModel();
         model.addRow(new Object[]{pid, ar, bt});
+        jtfPID.setText(Integer.parseInt(jtfPID.getText()) + 1 + "");
     }//GEN-LAST:event_btThemActionPerformed
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
@@ -275,10 +282,8 @@ public class TTs extends javax.swing.JFrame {
                 model.setValueAt(ta[i], i, 4);
                 model.setValueAt(wt[i], i, 5);
             }
-            jlbAvgwt.setText(avgwt/rowCount + "");
-        }
-
-        //SJF
+            jlbAvgwt.setText(avgwt / rowCount + "");
+        } //SJF
         else if (rdoSJF.isSelected()) {
             int f[] = new int[rowCount];
             int st = 0, tot = 0;
@@ -310,19 +315,118 @@ public class TTs extends javax.swing.JFrame {
                     f[c] = 1;
                     pid[tot] = c + 1;
                     tot++;
-                    
+
                     avgwt += wt[c];
                     avgta += ta[c];
                 }
             }
-            for(int i=0; i<rowCount; i++){
+            for (int i = 0; i < rowCount; i++) {
                 model.setValueAt(ct[i], i, 3);
                 model.setValueAt(ta[i], i, 4);
                 model.setValueAt(wt[i], i, 5);
             }
-            jlbAvgwt.setText(avgwt/rowCount + "");
+            jlbAvgwt.setText(avgwt / rowCount + "");
+        } //SRTN
+        else if (rdoSRTN.isSelected()) {
+            int[] remainingTime = new int[rowCount];
+            boolean[] isCompleted = new boolean[rowCount];
+            int currentTime = 0;
+            int completed = 0;
+
+            for (int i = 0; i < rowCount; i++) {
+                remainingTime[i] = bt[i];
+            }
+
+            while (completed != rowCount) {
+                int shortest = -1;
+                for (int i = 0; i < rowCount; i++) {
+                    if (!isCompleted[i] && ar[i] <= currentTime) {
+                        if (shortest == -1 || ar[i] < remainingTime[shortest]) {
+                            shortest = i;
+                        }
+                    }
+                }
+
+                if (shortest == -1) {
+                    currentTime++;
+                    continue;
+                }
+
+                remainingTime[shortest]--;
+
+                if (remainingTime[shortest] == 0) {
+                    ct[shortest] = currentTime + 1;
+                    ta[shortest] = ct[shortest] - ar[shortest];
+                    wt[shortest] = ta[shortest] - bt[shortest];
+                    isCompleted[shortest] = true;
+                    completed++;
+                }
+
+                currentTime++;
+            }
+
+            double totalTurnaroundTime = 0;
+            double totalWaitingTime = 0;
+            for (int i = 0; i < rowCount; i++) {
+                totalTurnaroundTime += ta[i];
+                totalWaitingTime += wt[i];
+            }
+
+            for (int i = 0; i < rowCount; i++) {
+                model.setValueAt(ct[i], i, 3);
+                model.setValueAt(ta[i], i, 4);
+                model.setValueAt(wt[i], i, 5);
+            }
+            jlbAvgwt.setText(totalWaitingTime / rowCount + "");
+
+        }//RR 
+        else if (rdoRR.isSelected()) {
+            jtfRR.setVisible(true);
+            if (jtfRR != null) {
+                int[] remainingTime = new int[rowCount];
+                int quantumTime = Integer.parseInt(jtfRR.getText());
+                int currentTime = 0;
+                int completedProcesses = 0;
+
+                for (int i = 0; i < rowCount; i++) {
+                    remainingTime[i] = bt[i];
+                }
+
+                while (completedProcesses < rowCount) {
+                    for (int i = 0; i < rowCount; i++) {
+                        if (remainingTime[i] > 0) {
+                            int executeTime = Math.min(remainingTime[i], quantumTime);
+                            currentTime += executeTime;
+                            remainingTime[i] -= executeTime;
+
+                            if (remainingTime[i] == 0) {
+                                ct[i] = currentTime;
+                                ta[i] = ct[i] - ar[i];
+                                wt[i] = ta[i] - bt[i];
+                                completedProcesses++;
+                            }
+                        }
+                    }
+                }
+
+                avgwt = calculateAverage(wt);
+
+                for (int i = 0; i < rowCount; i++) {
+                    model.setValueAt(ct[i], i, 3);
+                    model.setValueAt(ta[i], i, 4);
+                    model.setValueAt(wt[i], i, 5);
+                }
+                jlbAvgwt.setText(avgwt + "");
+            }
         }
     }//GEN-LAST:event_jButton1ActionPerformed
+    private static float calculateAverage(int[] array) {
+        int sum = 0;
+        for (int value : array) {
+            sum += value;
+        }
+        return (float) sum / array.length;
+    }
 
     /**
      * @param args the command line arguments
@@ -373,6 +477,7 @@ public class TTs extends javax.swing.JFrame {
     private static javax.swing.JTextField jtfAR;
     private static javax.swing.JTextField jtfBT;
     private static javax.swing.JTextField jtfPID;
+    private javax.swing.JTextField jtfRR;
     private javax.swing.JRadioButton rdoFCFS;
     private javax.swing.JRadioButton rdoRR;
     private javax.swing.JRadioButton rdoSJF;
